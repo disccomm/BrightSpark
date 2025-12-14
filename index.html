@@ -2,941 +2,474 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BrightSpark Learning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrightSpark Learning PWA</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#FFD166">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#4D908E">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
     <style>
-    /* --- DESIGN SYSTEM: GLASS MORPHISM & PLAYFUL --- */
-    :root {
-        --primary: #4D908E;     /* Teal */
-        --secondary: #F94144;   /* Soft Red (Error/Danger) */
-        --accent: #F9C74F;      /* Yellow (Highlight/Focus) */
-        --bg-start: #E6F3FF;    /* Light Sky Blue */
-        --bg-end: #F8F9FA;      /* Off-White */
-        --surface: rgba(255, 255, 255, 0.9); /* Frosted Glass Base */
-        --text: #277DA1;        /* Dark Blue Text */
-        --success: #6CB85C;     /* Encouraging Green */
-        --error: #F94144;
-        --radius: 20px;         /* Deeper rounding for touch */
-        --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15); /* Soft, deep shadow */
-        --inner-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6); /* Glass highlight */
-    }
+        /* --- DESIGN SYSTEM: GLASS MORPHISM & PLAYFUL --- */
+        :root {
+            --primary: #4D908E;     /* Teal */
+            --secondary: #F94144;   /* Soft Red (Error) */
+            --accent: #F9C74F;      /* Yellow (Highlight) */
+            --bg-start: #E6F3FF;    /* Light Sky Blue */
+            --bg-end: #F8F9FA;      /* Off-White */
+            --surface: rgba(255, 255, 255, 0.9); 
+            --text: #277DA1;        
+            --success: #6CB85C;     
+            --error: #F94144;
+            --radius: 20px;         
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15); 
+        }
 
-    * { box-sizing: border-box; touch-action: manipulation; }
-    body {
-        font-family: 'Comic Neue', 'Verdana', sans-serif;
-        /* Subtle Gradient Background */
-        background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
-        margin: 0;
-        padding: 0;
-        color: var(--text);
-        overscroll-behavior-y: none;
-        min-height: 100vh;
-    }
+        * { box-sizing: border-box; touch-action: manipulation; }
+        body {
+            font-family: 'Comic Neue', 'Verdana', sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            margin: 0; padding: 0; color: var(--text);
+            min-height: 100vh;
+        }
 
-    /* --- LAYOUTS --- */
-    .screen { 
-        display: none; 
-        padding: 20px; 
-        max-width: 800px; 
-        margin: 0 auto; 
-        min-height: 100vh; /* Use min-height for flexible scrolling */
-        overflow-y: auto; 
-        padding-bottom: 50px;
-    }
-    .screen.active { 
-        display: flex; 
-        flex-direction: column; 
-    }
-    
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    h1, h2, h3 { margin: 0; color: var(--primary); font-weight: 800; }
-    
-    /* --- GLASSMOPHIC CARDS --- */
-    .card {
-        background: var(--surface);
-        border-radius: var(--radius);
-        padding: 24px;
-        box-shadow: var(--shadow);
-        border: 1px solid rgba(255, 255, 255, 0.2); /* Frosted edge */
-        margin-bottom: 20px;
-        backdrop-filter: blur(8px); /* The key to the glass effect */
-        -webkit-backdrop-filter: blur(8px);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    /* Simple hover/active feedback for non-touch devices */
-    .card:active { transform: scale(0.99); box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1); } 
-    
-    /* --- BUTTONS (Tactile & Colorful) --- */
-    button {
-        background: var(--primary);
-        color: white;
-        border: none;
-        padding: 14px 28px; /* Bigger padding for touch */
-        border-radius: 50px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        cursor: pointer;
-        width: 100%;
-        margin-top: 10px;
-        box-shadow: 0 4px 0 var(--primary), var(--inner-shadow); /* Tactile 3D effect */
-        transition: all 0.15s ease;
-        min-height: 48px; /* Accessibility requirement for touch targets */
-    }
-    button:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--primary), var(--inner-shadow); }
-    
-    button.secondary { 
-        background: var(--accent); 
-        color: #333; 
-        box-shadow: 0 4px 0 var(--accent), var(--inner-shadow); 
-    }
-    button.secondary:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--accent), var(--inner-shadow); }
-    
-    button.danger { 
-        background: var(--secondary); 
-        box-shadow: 0 4px 0 var(--secondary), var(--inner-shadow); 
-    }
-    button.danger:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--secondary), var(--inner-shadow); }
+        /* --- LAYOUTS --- */
+        .screen { display: none; padding: 20px; max-width: 800px; margin: 0 auto; padding-bottom: 80px; }
+        .screen.active { display: flex; flex-direction: column; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        h1, h2 { margin: 0; color: var(--primary); font-weight: 800; }
 
-    button.outline { 
-        background: transparent; 
-        border: 2px solid var(--primary); 
-        color: var(--primary); 
-        box-shadow: none; 
-    }
-    
-    button:disabled { 
-        opacity: 0.4; 
-        cursor: not-allowed; 
-        box-shadow: none !important; 
-        transform: none !important; 
-        background: #ccc !important;
-        color: #666 !important;
-    }
+        /* --- GLASS CARDS --- */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            margin-bottom: 20px;
+        }
 
-    /* --- DASHBOARD --- */
-    .topic-item { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        background: rgba(255, 255, 255, 0.8); /* Lighter glass */
-        margin-bottom: 12px; 
-        padding: 18px; 
-        border-radius: 16px; 
-        border: 1px solid rgba(255, 255, 255, 0.4); 
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        cursor: pointer;
-    }
-    .topic-item.selected { 
-        border: 3px solid var(--primary); 
-        background-color: rgba(77, 144, 142, 0.1); /* Subtle teal background */
-    }
+        /* --- BUTTONS --- */
+        button {
+            background: var(--primary); color: white; border: none;
+            padding: 14px 24px; border-radius: 50px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            width: 100%; margin-top: 10px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        button:active { transform: translateY(2px); box-shadow: none; }
+        button.secondary { background: var(--accent); color: #333; }
+        button.danger { background: var(--secondary); }
+        button.outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); box-shadow: none; }
+        button:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    /* --- QUIZ UI --- */
-    .progress-container { 
-        height: 16px; /* Taller progress bar */
-        background: rgba(255, 255, 255, 0.5); 
-        border-radius: 10px; 
-        margin: 15px 0; 
-        overflow: hidden; 
-        box-shadow: var(--inner-shadow);
-    }
-    .progress-bar { 
-        height: 100%; 
-        background: linear-gradient(90deg, #81c784 0%, var(--success) 100%); 
-        width: 0%; 
-        transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth animation */
-    }
-    
-    .timer { font-size: 1.8rem; }
-    
-    .options-grid { display: grid; gap: 12px; margin-top: 20px; }
-    .option-btn { 
-        text-align: left; 
-        background: rgba(255, 255, 255, 0.7); 
-        color: var(--text); 
-        border: 2px solid #ddd; 
-        padding: 18px; 
-        border-radius: 16px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        transition: all 0.2s ease;
-    }
-    .option-btn:hover:not(.locked) { background: #f0f0f0; border-color: var(--primary); }
-    .option-btn:active:not(.locked) { transform: scale(0.98); }
-    
-    /* Feedback States */
-    .option-btn.correct { 
-        background: var(--success); 
-        border-color: #388e3c; 
-        color: white;
-        box-shadow: 0 4px 0 #388e3c;
-    }
-    .option-btn.correct:active { transform: translateY(2px); box-shadow: 0 2px 0 #388e3c; }
+        /* --- LISTS --- */
+        .topic-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.6); margin-bottom: 12px; padding: 15px;
+            border-radius: 16px; border: 1px solid rgba(255,255,255,0.4); cursor: pointer;
+        }
+        .topic-item.selected { border: 3px solid var(--primary); background: rgba(77, 144, 142, 0.1); }
 
-    .option-btn.wrong { 
-        background: var(--error); 
-        border-color: #d32f2f; 
-        color: white;
-        box-shadow: 0 4px 0 #d32f2f;
-    }
-    .option-btn.wrong:active { transform: translateY(2px); box-shadow: 0 2px 0 #d32f2f; }
-    
-    .option-btn.locked { pointer-events: none; opacity: 0.7; }
+        /* --- QUIZ UI --- */
+        .option-btn { 
+            text-align: left; background: white; color: var(--text);
+            border: 2px solid #ddd; padding: 15px; border-radius: 16px; margin-bottom: 10px;
+            width: 100%; transition: all 0.2s;
+        }
+        .option-btn.selected-pending { border-color: var(--primary); background: #e0f2f1; }
+        .option-btn.correct { background: var(--success); color: white; border-color: #388e3c; }
+        .option-btn.wrong { background: var(--error); color: white; border-color: #d32f2f; }
+        .option-btn.locked { pointer-events: none; }
 
-    .quiz-controls { display: flex; gap: 15px; margin-top: 30px; }
-    .nav-btn { flex: 1; padding: 12px; }
-
-    /* --- FLASHCARDS --- */
-    .flashcard-front, .flashcard-back {
-        border-width: 6px;
-        border-style: solid;
-        border-color: var(--accent);
-        box-shadow: var(--shadow);
-        background: var(--surface);
-    }
-    .flashcard-back { border-color: var(--primary); background: #f0f8ff; }
-
-
-    /* --- UTILS --- */
-    select { 
-        appearance: none; 
-        -webkit-appearance: none; 
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%234D908E" d="M10 4L6 8 2 4z"/></svg>');
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        padding-right: 30px !important;
-    }
-</style>
+        /* --- MODALS --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+        }
+        
+        /* --- PRINT STYLES (Worksheets) --- */
+        @media print {
+            body { background: white; color: black; }
+            .screen, header, button, .modal-overlay { display: none !important; }
+            #worksheet-screen { display: block !important; padding: 0; }
+            .worksheet-item { page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding: 20px 0; }
+        }
+    </style>
 </head>
 <body>
 
     <div id="dashboard" class="screen active">
-<header>
-    <h1>📚 My Library</h1>
-    <button class="secondary" style="width: auto; padding: 8px 16px;" onclick="openImportModal()">+ Import</button>
-</header>
+        <header>
+            <h1>📚 My Library</h1>
+            <div style="display: flex; gap: 8px;">
+                <button class="outline" style="width: auto; padding: 8px 12px;" onclick="openSettings()">⚙️ AI Key</button>
+                <button class="secondary" style="width: auto; padding: 8px 16px;" onclick="openImportModal()">+ Import</button>
+            </div>
+        </header>
 
-        <div id="topic-container" class="card">
-            <h3>Select a Topic:</h3>
-            <ul id="topic-list" class="topic-list">
-                <li style="text-align:center; color:#999; padding:20px;">No topics yet. Import a file!</li>
-            </ul>
+        <div id="topic-list" style="margin-bottom: 20px;">
+            <div style="text-align:center; color:#888; padding: 20px;">No topics yet. Click Import!</div>
         </div>
 
-        <div id="action-panel" class="hidden">
-            <div class="card">
-                <h3>Let's Practice!</h3>
-<div style="margin-bottom: 20px;">
-    <label for="grade-select" style="font-weight: bold; display: block; margin-bottom: 5px;">
-        Choose Your **Learning Zone**:
-    </label>
-    <select id="grade-select" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem;">
-        <option value="all">🚀 Review Everything</option>
-        <option value="4">👶 Starter Zone (Foundation)</option>
-        <option value="7" selected>💡 Explorer Zone (Core Concepts)</option>
-        <option value="10">🏆 Master Zone (Challenge)</option>
-    </select>
-</div>
-<hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-                <div style="margin-bottom: 15px;">
-                    <label>Number of Questions: <span id="q-count-val">10</span></label>
-                    <input type="range" id="q-slider" min="5" max="50" step="5" value="10" style="width:100%" oninput="updateSlider(this.value)">
-                </div>
-                
-                <button onclick="startQuiz()">🚀 Start Quiz</button>
-                <button class="secondary" onclick="startFlashcards()">🎴 Flashcards</button>
-                <button class="outline" onclick="generateWorksheet()">🖨️ Create Worksheet</button>
-                <button class="outline" style="margin-top:10px" onclick="downloadTemplate()">⬇️ Get Template</button>
-            </div>
+        <div id="action-panel" class="card hidden" style="display: none;">
+            <h3 id="selected-topic-title" style="margin-bottom: 15px;">Topic Actions</h3>
+            
+            <label style="font-weight:bold;">Learning Zone:</label>
+            <select id="zone-select" style="width: 100%; padding: 10px; margin: 5px 0 15px 0; border-radius: 8px;">
+                <option value="all">🚀 Review Everything</option>
+                <option value="4">👶 Starter (Levels 1-4)</option>
+                <option value="7" selected>💡 Explorer (Levels 5-9)</option>
+                <option value="10">🏆 Master (Levels 10+)</option>
+            </select>
+
+            <label style="font-weight:bold;">Questions:</label>
+            <input type="range" id="q-slider" min="5" max="50" value="10" oninput="document.getElementById('q-val').innerText = this.value">
+            <div style="text-align: right; font-weight: bold; color: var(--primary); margin-bottom: 15px;"><span id="q-val">10</span> Qs</div>
+
+            <button onclick="startQuiz()">🚀 Start Quiz</button>
+            <button class="secondary" onclick="startFlashcards()">🎴 Flashcards</button>
+            <button class="outline" onclick="generateWorksheet()">🖨️ Print Worksheet</button>
         </div>
     </div>
 
     <div id="quiz-screen" class="screen">
         <header>
-            <button class="outline" style="width:auto; padding:5px 10px;" onclick="exitQuiz()">✕ Exit</button>
-            <div class="timer" id="timer">00:00</div>
+            <button class="outline" style="width:auto; padding: 5px 10px;" onclick="quitQuiz()">✕ Exit</button>
+            <div id="timer" class="timer">00:00</div>
         </header>
         
-        <div class="progress-container">
-            <div id="quiz-progress" class="progress-bar"></div>
+        <div class="progress-container" style="background:#ddd; height:10px; border-radius:5px; margin-bottom:15px;">
+            <div id="quiz-progress" style="background:var(--success); height:100%; width:0%; transition:width 0.5s;"></div>
         </div>
 
         <div class="card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#666; font-size:0.9rem;">
-                <span id="q-number">Q 1/10</span>
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#888;">
+                <span id="q-number">Q 1</span>
                 <span id="q-score">Score: 0</span>
             </div>
-            
-            <img id="q-image" class="question-image hidden" src="" alt="Question Image">
-            <h2 id="q-text" style="font-size:1.3rem; margin-bottom:15px;">Question goes here?</h2>
-
-            <div id="options-container" class="options-grid">
-                </div>
-
-            <div id="feedback-area" class="feedback-msg"></div>
+            <h2 id="q-text" style="margin-bottom: 20px;">Question Text?</h2>
+            <div id="options-container"></div>
         </div>
 
-        <div class="quiz-controls">
-            <button id="btn-prev" class="nav-btn outline" onclick="navQuestion(-1)" disabled>Previous</button>
-            <button id="btn-clear" class="nav-btn secondary" onclick="clearAnswer()">Eraser</button>
-            <button id="btn-skip" class="nav-btn secondary" onclick="skipQuestion()">Skip</button>
-            <button id="btn-next" class="nav-btn" onclick="navQuestion(1)" disabled>Next</button>
-        </div>
-    </div>
+        <div style="min-height: 24px; text-align: center; font-weight: bold; margin-bottom: 10px;" id="feedback-area"></div>
 
-    <div id="result-screen" class="screen">
-        <header><h1>🎉 Good Effort!</h1></header>
-        <div class="card" style="text-align:center;">
-            <h2 id="final-score">8/10</h2>
-            <p id="motivational-msg">You are learning fast!</p>
-            <button onclick="retryWrong()">🔄 Retry Mistakes</button>
-            <button class="secondary" onclick="goHome()">🏠 Home</button>
+        <div style="display: flex; gap: 10px;">
+            <button id="btn-clear" class="outline" onclick="clearSelection()" disabled>Eraser</button>
+            <button id="btn-next" onclick="nextQuestion()">Next ➡</button>
         </div>
-        
-        <h3>Review Mistakes</h3>
-        <div id="review-list">
-            </div>
     </div>
 
     <div id="flashcard-screen" class="screen">
         <header>
-            <button class="outline" style="width:auto;" onclick="goHome()">Back</button>
-            <h3>Flashcards</h3>
+            <button class="outline" style="width:auto;" onclick="showScreen('dashboard')">⬅ Back</button>
+            <h2>Flashcards</h2>
         </header>
-        
-        <div class="flashcard-container" onclick="flipCard()">
-            <div class="flashcard-inner" id="fc-inner">
-                <div class="flashcard-front">
-                    <h2 id="fc-front-text">Question</h2>
-                </div>
-                <div class="flashcard-back">
-                    <h3 id="fc-back-text">Answer</h3>
-                    <small id="fc-ref" class="ref-link">Ref: Page 12</small>
-                </div>
+        <div class="card" onclick="this.classList.toggle('flipped')" style="min-height: 300px; display:flex; align-items:center; justify-content:center; text-align:center; cursor:pointer; perspective: 1000px;">
+            <div id="fc-content">
+                <h3>Tap to Flip</h3>
             </div>
         </div>
-        
-        <div class="quiz-controls">
-            <button class="nav-btn outline" onclick="navFlashcard(-1)">Previous</button>
-            <button class="nav-btn" onclick="navFlashcard(1)">Next</button>
+        <div style="display:flex; justify-content:space-between;">
+            <button class="secondary" style="width:45%" onclick="prevCard()">⬅ Prev</button>
+            <button class="secondary" style="width:45%" onclick="nextCard()">Next ➡</button>
         </div>
     </div>
 
-    <div id="worksheet-view"></div>
+    <div id="worksheet-screen" style="display:none; padding: 40px;">
+        <h1 id="ws-title" style="text-align:center; border-bottom: 2px solid black; padding-bottom:10px;">Practice Worksheet</h1>
+        <div id="ws-content"></div>
+    </div>
+
+    <div id="import-modal" class="modal-overlay">
+        <div class="card" style="width: 90%; max-width: 400px;">
+            <h2>📥 Import Content</h2>
+            <p>Upload a PDF to auto-generate a quiz using AI, or a JSON file.</p>
+            
+            <input type="text" id="imp-title" placeholder="Full Title (e.g. Solar System)" style="width:100%; padding:10px; margin-bottom:10px;">
+            <input type="text" id="imp-nick" placeholder="Nickname (e.g. Space)" style="width:100%; padding:10px; margin-bottom:10px;">
+            <input type="file" id="imp-file" accept=".pdf, .json" style="margin-bottom:15px;">
+            
+            <button onclick="processImport()">✅ Start Import</button>
+            <button class="outline danger" onclick="document.getElementById('import-modal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay">
+        <div class="card" style="width: 90%; max-width: 400px;">
+            <h2>⚙️ AI Settings</h2>
+            <p>Paste your <a href="https://aistudio.google.com/app/apikey" target="_blank">Google Gemini API Key</a> to enable PDF-to-Quiz generation.</p>
+            <input type="password" id="api-key" placeholder="AIzaSy..." style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ccc; border-radius:8px;">
+            <button onclick="saveSettings()">💾 Save Key</button>
+            <button class="outline" onclick="document.getElementById('settings-modal').style.display='none'">Close</button>
+        </div>
+    </div>
 
     <script>
-        // --- 1. STATE MANAGEMENT ---
+        // --- 1. STATE & INIT ---
         const DB_KEY = 'brightspark_db';
-
-// --- 1.5. API Configuration (Architect Warning: Key is exposed in public JS) ---
-// IMPORTANT: Replace 'YOUR_PEXELS_API_KEY_HERE' with your actual Pels Key.
-const PEXELS_API_KEY = 'qQZw9X3j2A76TuOYYHDo2ssebWP5H7K056k1rpdOTVvqh7SVDQr4YyWM'; 
-
-        let appState = {
-            topics: JSON.parse(localStorage.getItem(DB_KEY)) || {},
-            currentTopicId: null,
-            session: {
-                questions: [],     // The subset for this quiz
-                currentIndex: 0,
-                answers: {},       // { qId: { selectedOptionId, isCorrect, timeTaken } }
-                timer: 0,
-                timerInterval: null,
-                isPaused: false
-            }
-        };
-
-        // --- 2. AUDIO ENGINE (Base64 for offline compat) ---
-        // Simple synth beeps can be used, but for MVP we assume browser defaults or add files later.
-        const playSound = (type) => {
-            // Placeholder: In a real app, use AudioContext or preloaded MP3s
-            // console.log(`Playing sound: ${type}`);
-        };
-
-        // --- 3. CORE FUNCTIONS ---
+        let appState = { topics: {}, currentTopicId: null, session: {} };
         
-        function saveDB() {
-            localStorage.setItem(DB_KEY, JSON.stringify(appState.topics));
-        }
-
-        function triggerImport() { document.getElementById('fileInput').click(); }
-
-function handleFileUpload() {
-    const file = document.getElementById('fileInput').files[0];
-    const title = document.getElementById('import-title').value.trim();
-    const nickname = document.getElementById('import-nickname').value.trim();
-
-    if (!file || !title || !nickname) {
-        alert("Please provide a Title, Nickname, and select a file.");
-        return;
-    }
-    
-    // Check for existing title/nickname
-    const existing = Object.values(appState.topics).find(t => t.title === title || t.nickname === nickname);
-    if (existing) {
-        if (!confirm(`A topic with the title "${title}" or nickname "${nickname}" already exists. Do you want to DELETE the old version and replace it with this new file?`)) {
-            return;
-        }
-        // Deletion/Replacement Logic (Requirement 1)
-        delete appState.topics[existing.id];
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const data = JSON.parse(e.target.result);
-            // Assuming JSON contains 'questions' array. If PDF, this step would be server-side OCR.
-            if (!Array.isArray(data.questions)) throw new Error("File must contain a 'questions' array.");
-            
-            const id = Date.now().toString();
-            appState.topics[id] = {
-                id: id,
-                title: title,       // Full User Title
-                nickname: nickname, // User-chosen Nickname (GK, Maths)
-                questions: data.questions,
-                imageRoot: "" 
-            };
-            saveDB();
-            closeImportModal();
+        // Load Data on Startup
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem(DB_KEY);
+            if (saved) appState = JSON.parse(saved);
             renderDashboard();
             
-            // Clear inputs after successful import
-            document.getElementById('import-title').value = '';
-            document.getElementById('import-nickname').value = '';
-            document.getElementById('fileInput').value = '';
-            document.getElementById('fileNameDisplay').innerText = 'No file selected.';
-
-            alert(`Import Successful! Topic "${nickname}" added with ${data.questions.length} questions. 🌟`);
-        } catch (err) {
-            alert("Error: File content is invalid or not in the expected JSON format. Please use the template.");
-        }
-    };
-    // If PDF, we'd send the file to a server endpoint here. For PWA MVP, we read as text (JSON).
-    reader.readAsText(file); 
-}
-// --- NEW PATH SETTING FUNCTION (Add to index.html JS) ---
-function setImageRootPath(topicId, path) {
-    if (appState.topics[topicId]) {
-        // Ensure path ends with a slash for easy concatenation
-        appState.topics[topicId].imageRoot = path.endsWith('/') ? path : path + '/';
-        saveDB();
-        alert(`Image path for ${appState.topics[topicId].title} set to: ${path}`);
-    }
-}
-        function renderDashboard() {
-            const list = document.getElementById('topic-list');
-            list.innerHTML = '';
-            
-            Object.values(appState.topics).forEach(topic => {
-                const li = document.createElement('li');
-                li.className = 'topic-item';
-                li.innerHTML = `
-                <div>
-                    <strong>${topic.nickname}</strong><br> 
-                    <small>${topic.title} (${topic.questions.length} Qs)</small>
-                </div>
-                <button class="danger" style="width:auto; padding:5px 10px; font-size:0.8rem" onclick="deleteTopic('${topic.id}')">🗑️</button>
-            `;                li.onclick = (e) => {
-                    if(e.target.tagName !== 'BUTTON') selectTopic(topic.id, li);
-                };
-                list.appendChild(li);
-            });
-        }
-
-        function deleteTopic(id) {
-            if(confirm("Delete this topic?")) {
-                delete appState.topics[id];
-                saveDB();
-                renderDashboard();
-                document.getElementById('action-panel').classList.add('hidden');
-            }
-        }
-
-        function selectTopic(id, element) {
-            document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            appState.currentTopicId = id;
-            
-            const topic = appState.topics[id];
-            const maxQ = topic.questions.length;
-            const slider = document.getElementById('q-slider');
-            slider.max = maxQ;
-            slider.value = Math.min(10, maxQ);
-            document.getElementById('q-count-val').innerText = slider.value;
-            
-            document.getElementById('action-panel').classList.remove('hidden');
-        }
-
-        function updateSlider(val) {
-            document.getElementById('q-count-val').innerText = val;
-        }
-
-function openImportModal() {
-    document.getElementById('import-modal').style.display = 'flex';
-}
-function closeImportModal() {
-    document.getElementById('import-modal').style.display = 'none';
-}
-function updateFileName() {
-    const input = document.getElementById('fileInput');
-    document.getElementById('fileNameDisplay').innerText = input.files.length > 0 ? input.files[0].name : 'No file selected.';
-}
-        // --- 4. QUIZ ENGINE ---
-// --- Start Quiz Function (Updated for Learning Zone Filtering) ---
-function startQuiz(isRetry = false) {
-    const topic = appState.topics[appState.currentTopicId];
-    if (!topic) return;
-
-    const selectedZoneValue = document.getElementById('grade-select').value;
-    let pool = [];
-
-    // 1. FILTER POOL BY LEARNING ZONE
-    let availableQuestions = topic.questions;
-    if (selectedZoneValue !== 'all' && !isRetry) {
-        const centerGrade = parseInt(selectedZoneValue); // e.g., 7 for Explorer
-        const minGrade = Math.max(1, centerGrade - 3);   // e.g., 4 (7-3)
-        const maxGrade = centerGrade + 3;                // e.g., 10 (7+3)
-        
-        // Filter: Keep questions within the defined Learning Zone range (Center +/- 3)
-        availableQuestions = availableQuestions.filter(q => 
-            q.gradeLevel >= minGrade && q.gradeLevel <= maxGrade
-        );
-        
-        if (availableQuestions.length === 0) {
-            alert(`Warning: No questions found for the selected Learning Zone (Levels ${minGrade}-${maxGrade}). Please select 'Review Everything' or import more zoned questions.`);
-            return; 
-        }
-    }
-    
-    // 2. DETERMINE FINAL QUESTION SET
-    if (isRetry) {
-        // Get wrong answers from previous session (Retry overrides Zone filter)
-        const wrongIds = Object.keys(appState.session.answers).filter(k => !appState.session.answers[k].isCorrect);
-        pool = topic.questions.filter(q => wrongIds.includes(q.id));
-    } else {
-        const count = parseInt(document.getElementById('q-slider').value);
-        // Shuffle and slice the Zone-filtered set
-        pool = [...availableQuestions].sort(() => 0.5 - Math.random()).slice(0, count);
-    }
-
-    // 3. VALIDATION 
-    const requestedCount = parseInt(document.getElementById('q-slider').value);
-    if (!isRetry && pool.length < requestedCount) {
-        // PM Note: Rephrase warning to be encouraging.
-        console.warn(`Only ${pool.length} questions were available in this zone.`);
-    }
-
-    if (pool.length === 0) { alert("No questions available in the pool!"); return; }
-
-    // Initialize Session (rest of the logic remains the same)
-    appState.session = {
-        questions: pool,
-        currentIndex: 0,
-        answers: {},
-        timer: 0,
-        isPaused: false
-    };
-    
-    // ... (rest of the timer logic is unchanged and goes here)
-    if (appState.session.timerInterval) clearInterval(appState.session.timerInterval);
-    appState.session.timerInterval = setInterval(() => {
-        if(!appState.session.isPaused) {
-            appState.session.timer++;
-            const m = Math.floor(appState.session.timer / 60).toString().padStart(2,'0');
-            const s = (appState.session.timer % 60).toString().padStart(2,'0');
-            document.getElementById('timer').innerText = `${m}:${s}`;
-        }
-    }, 1000);
-
-    showScreen('quiz-screen');
-    renderQuestion();
-}
-        function renderQuestion() {
-            const q = appState.session.questions[appState.session.currentIndex];
-            const total = appState.session.questions.length;
-            
-            document.getElementById('q-number').innerText = `Q ${appState.session.currentIndex + 1}/${total}`;
-            document.getElementById('q-text').innerText = q.text;
-            
-            // Image handling (Placeholder for Pexels API or local path)
-const imgEl = document.getElementById('q-image');
-if(q.image) {
-    const topic = appState.topics[appState.currentTopicId];
-    // Construct the full local path: [UserRootPath] + [Filename]
-    imgEl.src = (topic.imageRoot || '') + q.image; 
-    imgEl.classList.remove('hidden');
-} else {
-    imgEl.classList.add('hidden');
-}
-
-            // Options Shuffling (ensure correct answer isn't always same pos)
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            
-            // Clone options to not mutate original data
-            let options = [...q.options];
-            options.sort(() => 0.5 - Math.random()); // Shuffle options
-
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerText = opt.text;
-                btn.onclick = () => selectAnswer(q.id, opt.id, q.answerId, btn);
-                container.appendChild(btn);
-            });
-
-            // Reset UI state
-            document.getElementById('feedback-area').innerText = '';
-            document.getElementById('btn-next').disabled = true;
-            document.getElementById('btn-prev').disabled = appState.session.currentIndex === 0;
-            document.getElementById('btn-clear').disabled = false;
-            
-            // Restore state if answered
-            if(appState.session.answers[q.id]) {
-                const saved = appState.session.answers[q.id];
-                // Visual restoration logic would go here
-                document.getElementById('btn-clear').disabled = true;
-                document.getElementById('btn-next').disabled = false;
-            }
-        }
-
-function selectAnswer(qId, selectedOptId, correctOptId, btnElement) {
-    const q = appState.session.questions[appState.session.currentIndex];
-    
-    // 1. Clear previous selections for this question's options
-    document.querySelectorAll('.option-btn').forEach(b => {
-        b.classList.remove('selected-pending', 'correct', 'wrong', 'locked');
-        // Re-enable click events on all options
-        b.style.pointerEvents = 'auto';
-    });
-
-    // 2. Apply the 'Selected-Pending' state to the chosen option
-    btnElement.classList.add('selected-pending');
-    
-    // 3. Store the temporary answer
-    appState.session.answers[qId] = {
-        selected: selectedOptId,
-        isCorrect: (selectedOptId === correctOptId),
-        // We will finalize score/progress on 'Next' press
-    };
-
-    // 4. Enable Eraser and Next buttons
-    document.getElementById('btn-next').disabled = false;
-    document.getElementById('btn-clear').disabled = false;
-}
-
-// B. New Function: Finalize Answer (Called by 'Next' button)
-function finalizeAnswer() {
-    const q = appState.session.questions[appState.session.currentIndex];
-    const answer = appState.session.answers[q.id];
-    if (!answer || !answer.selected) return; // Should not happen if Next is enabled
-
-    const buttons = document.querySelectorAll('.option-btn');
-    const selectedBtn = document.querySelector('.selected-pending');
-
-    // 1. Lock all options and provide immediate feedback (Green/Red)
-    buttons.forEach(b => b.classList.add('locked'));
-    
-    if (answer.isCorrect) {
-        selectedBtn.classList.add('correct');
-        document.getElementById('feedback-area').innerText = "Correct! 🎉";
-        document.getElementById('feedback-area').style.color = "var(--success)";
-        playSound('success');
-    } else {
-        selectedBtn.classList.add('wrong');
-        // Find and highlight the correct answer
-        buttons.forEach(b => {
-            if (b.innerText.trim() === q.options.find(o => o.id === q.answerId).text.trim()) {
-                 b.classList.add('correct'); // Show the correct answer
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').then(() => console.log('SW Registered'));
             }
         });
-        document.getElementById('feedback-area').innerText = "Oops! Keep trying!";
-        document.getElementById('feedback-area').style.color = "var(--error)";
-    }
-    
-    // 2. Disable Eraser after feedback is given
-    document.getElementById('btn-clear').disabled = true;
 
-    // 3. Update Score/Progress (Finalization Logic)
-    const score = Object.values(appState.session.answers).filter(a => a.isCorrect).length;
-    document.getElementById('q-score').innerText = `Score: ${score}`;
-    
-    const answeredCount = Object.keys(appState.session.answers).length;
-    const pct = (answeredCount / appState.session.questions.length) * 100;
-    document.getElementById('quiz-progress').style.width = `${pct}%`;
-
-    // 4. Proceed to the next question immediately after feedback
-    setTimeout(() => {
-        navQuestion(1);
-    }, 1200); // Give 1.2s to see feedback before moving
-}
-
-// C. Update 'clearAnswer'
-function clearAnswer() {
-    const qId = appState.session.questions[appState.session.currentIndex].id;
-    
-    // 1. Remove answer from session
-    delete appState.session.answers[qId];
-
-    // 2. Remove selected styling
-    document.querySelectorAll('.option-btn').forEach(b => {
-        b.classList.remove('selected-pending', 'correct', 'wrong', 'locked');
-        b.style.pointerEvents = 'auto'; // Ensure options are clickable again
-    });
-
-    // 3. Update buttons
-    document.getElementById('feedback-area').innerText = '';
-    document.getElementById('btn-next').disabled = true;
-    document.getElementById('btn-clear').disabled = true;
-}
-
-// D. Update 'navQuestion' to use finalization logic
-function navQuestion(dir) {
-    if (dir === 1 && document.querySelector('.selected-pending')) {
-        // If moving forward and an answer is pending, finalize it first
-        finalizeAnswer();
-        return;
-    }
-    
-    const newIndex = appState.session.currentIndex + dir;
-    if (newIndex >= appState.session.questions.length) {
-        finishQuiz();
-    } else {
-        appState.session.currentIndex = newIndex;
-        renderQuestion();
-    }
-}
-        function clearAnswer() {
-            const buttons = document.querySelectorAll('.option-btn');
-            buttons.forEach(b => {
-                b.classList.remove('locked', 'correct', 'wrong');
-            });
-            document.getElementById('feedback-area').innerText = '';
-            // Note: In strict mode, you might not allow clearing after selection. 
-            // Here we allow it *before* locking? The requirements say "before locking". 
-            // My implementation locks immediately on select. 
-            // To support "Eraser", we would need a "Submit" step or allow unlock.
-            // Modified flow: Unlock buttons.
-            buttons.forEach(b => b.classList.remove('locked'));
-        }
-        
-        function skipQuestion() {
-            navQuestion(1);
+        function saveDB() {
+            localStorage.setItem(DB_KEY, JSON.stringify(appState));
         }
 
-        function navQuestion(dir) {
-            const newIndex = appState.session.currentIndex + dir;
-            if (newIndex >= appState.session.questions.length) {
-                finishQuiz();
-            } else {
-                appState.session.currentIndex = newIndex;
-                renderQuestion();
-            }
-        }
-
-        function finishQuiz() {
-            clearInterval(appState.session.timerInterval);
-            showScreen('result-screen');
-            
-            const total = appState.session.questions.length;
-            const correct = Object.values(appState.session.answers).filter(a => a.isCorrect).length;
-            
-            document.getElementById('final-score').innerText = `${correct} / ${total}`;
-            
-            // Render Review
-            const list = document.getElementById('review-list');
-            list.innerHTML = '';
-            
-            appState.session.questions.forEach(q => {
-                const ans = appState.session.answers[q.id];
-                if (!ans || !ans.isCorrect) {
-                    const div = document.createElement('div');
-                    div.className = 'card';
-                    div.style.borderLeft = '5px solid var(--secondary)';
-                    div.innerHTML = `
-                        <strong>${q.text}</strong><br>
-                        <span style="color:var(--success)">Correct Answer: Option ${q.answerId}</span><br>
-                        <small>Ref: PDF Page ${q.refPage || 'N/A'}</small>
-                    `;
-                    list.appendChild(div);
-                }
-            });
-        }
-        
-        function retryWrong() {
-            startQuiz(true);
-        }
-
-        function exitQuiz() {
-            if(confirm("Exit Quiz? Progress will be lost.")) {
-                finishQuiz();
-            }
-        }
-
-        // --- 5. FLASHCARDS ---
-        let fcIndex = 0;
-        function startFlashcards() {
-            const topic = appState.topics[appState.currentTopicId];
-            fcIndex = 0;
-            showScreen('flashcard-screen');
-            renderFlashcard();
-        }
-        
-        function renderFlashcard() {
-            const topic = appState.topics[appState.currentTopicId];
-            const q = topic.questions[fcIndex];
-            
-            document.getElementById('fc-inner').classList.remove('flipped');
-            document.getElementById('fc-front-text').innerText = q.text;
-            
-            // Find correct answer text
-            const correctOpt = q.options.find(o => o.id === q.answerId);
-            document.getElementById('fc-back-text').innerText = correctOpt ? correctOpt.text : "Answer not found";
-            document.getElementById('fc-ref').innerText = `Source Page: ${q.refPage || 'N/A'}`;
-        }
-        
-        function flipCard() {
-            document.getElementById('fc-inner').classList.toggle('flipped');
-        }
-        
-        function navFlashcard(dir) {
-            const topic = appState.topics[appState.currentTopicId];
-            let newIndex = fcIndex + dir;
-            if (newIndex < 0) newIndex = 0;
-            if (newIndex >= topic.questions.length) newIndex = topic.questions.length - 1;
-            fcIndex = newIndex;
-            renderFlashcard();
-        }
-
-        // --- 6. WORKSHEET GEN ---
-        function generateWorksheet() {
-            const topic = appState.topics[appState.currentTopicId];
-            const view = document.getElementById('worksheet-view');
-            view.innerHTML = '';
-            
-            // Create Pages (20 questions per page)
-            const chunkSize = 20;
-            for (let i = 0; i < topic.questions.length; i += chunkSize) {
-                const chunk = topic.questions.slice(i, i + chunkSize);
-                const page = document.createElement('div');
-                page.className = 'worksheet-page';
-                
-                page.innerHTML = `<h2>${topic.title} - Worksheet ${Math.floor(i/chunkSize)+1}</h2>`;
-                
-                chunk.forEach((q, idx) => {
-                    const qDiv = document.createElement('div');
-                    qDiv.className = 'ws-question';
-                    qDiv.innerHTML = `
-                        <p><strong>${i + idx + 1}. ${q.text}</strong></p>
-                        <div style="margin-left:20px;">
-                           ${q.options.map(o => `⬜ ${o.text}`).join('&nbsp;&nbsp;&nbsp;&nbsp;')}
-                        </div>
-                    `;
-                    page.appendChild(qDiv);
-                });
-                
-                view.appendChild(page);
-            }
-            
-            window.print();
-        }
-
-        // --- 7. UTILS & INIT ---
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        function goHome() {
-            showScreen('dashboard');
+        // --- 2. IMPORT LOGIC (PDF + AI) ---
+        function openImportModal() { document.getElementById('import-modal').style.display = 'flex'; }
+        function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+
+        function saveSettings() {
+            const key = document.getElementById('api-key').value.trim();
+            if(key) {
+                localStorage.setItem('gemini_key', key);
+                alert('Key Saved!');
+                document.getElementById('settings-modal').style.display='none';
+            }
         }
 
-        function downloadTemplate() {
-            const template = {
-                "title": "Topic Name Here",
-                "questions": [
-                    {
-                        "id": "q1",
-                        "text": "What is the capital of France?",
-                        "type": "mcq",
-                        "image": "", 
-                        "refPage": 10,
-                        "options": [
-                            {"id": "A", "text": "Berlin"},
-                            {"id": "B", "text": "Madrid"},
-                            {"id": "C", "text": "Paris"},
-                            {"id": "D", "text": "Rome"}
-                        ],
-                        "answerId": "C"
-                    }
-                ]
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(template, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "quiz_template.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
+        async function processImport() {
+            const file = document.getElementById('imp-file').files[0];
+            const title = document.getElementById('imp-title').value;
+            const nick = document.getElementById('imp-nick').value;
+            const btn = document.querySelector('#import-modal button');
 
-        // Init
-        renderDashboard();
+            if (!file || !title || !nick) return alert("Please fill all fields");
 
-    </script>
-<script>
-    // --- PWA REGISTRATION ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then((reg) => {
-                    console.log('Service Worker Registered! Scope:', reg.scope);
+            btn.innerText = "⏳ Processing (Please Wait)...";
+            btn.disabled = true;
+
+            try {
+                let questions = [];
+                if (file.type === 'application/json') {
+                    const text = await file.text();
+                    questions = JSON.parse(text).questions;
+                } else if (file.type === 'application/pdf') {
+                    const apiKey = localStorage.getItem('gemini_key');
+                    if (!apiKey) throw new Error("Please set API Key in Settings first.");
                     
-                    // Optional: Check for updates
-                    reg.onupdatefound = () => {
-                        const installingWorker = reg.installing;
-                        installingWorker.onstatechange = () => {
-                            if (installingWorker.state === 'installed') {
-                                if (navigator.serviceWorker.controller) {
-                                    console.log('New content is available; please refresh.');
-                                    // You could show a "Update Available" toast notification here
-                                } else {
-                                    console.log('Content is cached for offline use.');
-                                }
-                            }
-                        };
-                    };
-                })
-                .catch((err) => {
-                    console.error('Service Worker registration failed:', err);
-                });
-        });
-    }
-</script>
-<div id="import-modal" class="screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.4); display: none; align-items: center; justify-content: center;">
-    <div class="card" style="width: 90%; max-width: 500px; padding: 30px; transform: scale(0.95);">
-        <header>
-            <h2 style="color: var(--primary);">📝 Import New Topic</h2>
-            <button class="outline danger" style="width:auto; padding:5px 10px; font-size:0.8rem; box-shadow:none;" onclick="closeImportModal()">✕</button>
-        </header>
+                    const pdfText = await extractPdfText(file);
+                    questions = await generateQuizAI(pdfText, apiKey);
+                }
 
-        <label for="import-title" style="display: block; margin-bottom: 5px; font-weight: bold;">1. Topic Title (e.g., General Knowledge):</label>
-        <input type="text" id="import-title" placeholder="Enter file title/topic name" 
-               style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;">
-        
-        <label for="import-nickname" style="display: block; margin-bottom: 5px; font-weight: bold;">2. Topic Nickname (e.g., GK):</label>
-        <input type="text" id="import-nickname" placeholder="Short name for selection (GK, Maths)" 
-               style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc;">
-        
-        <label for="fileInput" style="display: block; margin-bottom: 5px; font-weight: bold;">3. Select PDF/JSON File:</label>
-        <input type="file" id="fileInput" accept=".json, .pdf" style="margin-bottom: 20px;" onchange="updateFileName()">
-        
-        <div id="fileNameDisplay" style="margin-bottom: 15px; font-size: 0.9rem; color: #666;">No file selected.</div>
+                const id = Date.now().toString();
+                appState.topics[id] = { id, title, nickname: nick, questions };
+                saveDB();
+                renderDashboard();
+                document.getElementById('import-modal').style.display = 'none';
+                alert(`Success! Imported ${questions.length} questions.`);
+            } catch (e) {
+                alert("Error: " + e.message);
+                console.error(e);
+            } finally {
+                btn.innerText = "✅ Start Import";
+                btn.disabled = false;
+            }
+        }
 
-        <button onclick="handleFileUpload()">✅ Confirm & Import</button>
-    </div>
-</div>
+        // PDF Helper
+        async function extractPdfText(file) {
+            const ab = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(ab).promise;
+            let text = "";
+            for (let i = 1; i <= Math.min(pdf.numPages, 5); i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(item => item.str).join(' ');
+            }
+            return text;
+        }
+
+        // AI Helper
+        async function generateQuizAI(text, key) {
+            const prompt = `Generate 15 quiz questions (MCQ) from this text for a Grade 6 student. Return ONLY raw JSON. Format: { "questions": [ { "id": "1", "text": "...", "options": [{"id":"a","text":"..."}], "answerId": "a" } ] } Text: ${text.substring(0, 10000)}`;
+            
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+            const data = await response.json();
+            let jsonStr = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
+            return JSON.parse(jsonStr).questions;
+        }
+
+        // --- 3. DASHBOARD LOGIC ---
+        function renderDashboard() {
+            const list = document.getElementById('topic-list');
+            list.innerHTML = '';
+            Object.values(appState.topics).forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'topic-item';
+                div.innerHTML = `<div><strong>${t.nickname}</strong><br><small>${t.title}</small></div>`;
+                div.onclick = () => selectTopic(t.id, div);
+                list.appendChild(div);
+            });
+        }
+
+        function selectTopic(id, el) {
+            document.querySelectorAll('.topic-item').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            appState.currentTopicId = id;
+            document.getElementById('action-panel').style.display = 'block';
+            document.getElementById('selected-topic-title').innerText = appState.topics[id].title;
+        }
+
+        // --- 4. QUIZ LOGIC (With Fixes) ---
+        function startQuiz() {
+            const topic = appState.topics[appState.currentTopicId];
+            const zone = document.getElementById('zone-select').value;
+            // Basic filtering logic (simulated for generated content)
+            const pool = topic.questions.slice(0, parseInt(document.getElementById('q-slider').value));
+            
+            appState.session = {
+                questions: pool,
+                index: 0,
+                answers: {},
+                score: 0
+            };
+            showScreen('quiz-screen');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = appState.session.questions[appState.session.index];
+            document.getElementById('q-number').innerText = `Q ${appState.session.index + 1}/${appState.session.questions.length}`;
+            document.getElementById('q-text').innerText = q.text;
+            document.getElementById('feedback-area').innerText = '';
+            document.getElementById('btn-next').innerText = (appState.session.index === appState.session.questions.length - 1) ? "Finish" : "Next ➡";
+            
+            // Reset Buttons
+            document.getElementById('btn-clear').disabled = true;
+            document.getElementById('btn-next').disabled = true; // Wait for selection
+
+            const con = document.getElementById('options-container');
+            con.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => selectAnswer(btn, opt.id, q.answerId);
+                con.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(btn, optId, correctId) {
+            // Remove previous pending
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected-pending'));
+            btn.classList.add('selected-pending');
+            
+            // Store temp answer
+            appState.session.tempAnswer = { optId, correctId, btn };
+            
+            // Enable controls
+            document.getElementById('btn-clear').disabled = false;
+            document.getElementById('btn-next').disabled = false;
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected-pending'));
+            appState.session.tempAnswer = null;
+            document.getElementById('btn-clear').disabled = true;
+            document.getElementById('btn-next').disabled = true;
+        }
+
+        function nextQuestion() {
+            const ans = appState.session.tempAnswer;
+            
+            // 1. Lock and Grade
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.add('locked'));
+            
+            if (ans.optId === ans.correctId) {
+                ans.btn.classList.add('correct');
+                document.getElementById('feedback-area').innerText = "Correct! 🎉";
+                document.getElementById('feedback-area').style.color = "var(--success)";
+                appState.session.score++;
+            } else {
+                ans.btn.classList.add('wrong');
+                document.getElementById('feedback-area').innerText = "Oops!";
+                document.getElementById('feedback-area').style.color = "var(--error)";
+            }
+            document.getElementById('q-score').innerText = `Score: ${appState.session.score}`;
+
+            // 2. Delay then Move
+            setTimeout(() => {
+                if (appState.session.index < appState.session.questions.length - 1) {
+                    appState.session.index++;
+                    renderQuestion();
+                } else {
+                    alert(`Quiz Complete! Score: ${appState.session.score}`);
+                    showScreen('dashboard');
+                }
+            }, 1500);
+        }
+        
+        function quitQuiz() {
+            if(confirm('Exit quiz? Progress will be lost.')) showScreen('dashboard');
+        }
+
+        // --- 5. FLASHCARDS & WORKSHEET ---
+        function startFlashcards() {
+            appState.fcIndex = 0;
+            showScreen('flashcard-screen');
+            renderFlashcard();
+        }
+
+        function renderFlashcard() {
+            const q = appState.topics[appState.currentTopicId].questions[appState.fcIndex];
+            const correctText = q.options.find(o => o.id === q.answerId).text;
+            document.getElementById('fc-content').innerHTML = `<h3>${q.text}</h3><p style="margin-top:20px; color:#666; font-size:0.9rem;">(Tap to see answer)</p><div style="display:none; margin-top:20px; color:var(--primary); font-weight:bold;">${correctText}</div>`;
+            document.querySelector('.card').onclick = function() {
+                this.querySelector('div[style*="none"]').style.display = 'block';
+            }
+        }
+        function nextCard() { 
+            if (appState.fcIndex < appState.topics[appState.currentTopicId].questions.length - 1) {
+                appState.fcIndex++; renderFlashcard(); 
+            }
+        }
+        function prevCard() { 
+            if (appState.fcIndex > 0) { appState.fcIndex--; renderFlashcard(); }
+        }
+
+        function generateWorksheet() {
+            const t = appState.topics[appState.currentTopicId];
+            const con = document.getElementById('ws-content');
+            con.innerHTML = '';
+            document.getElementById('ws-title').innerText = t.title + " Worksheet";
+            
+            t.questions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'worksheet-item';
+                div.innerHTML = `<strong>${i+1}. ${q.text}</strong><br>` + 
+                    q.options.map(o => `<span style="display:inline-block; margin: 10px 20px 0 0;">⬜ ${o.text}</span>`).join('');
+                con.appendChild(div);
+            });
+            window.print();
+        }
+    </script>
 </body>
 </html>
