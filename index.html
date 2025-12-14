@@ -214,11 +214,10 @@
 <body>
 
     <div id="dashboard" class="screen active">
-        <header>
-            <h1>📚 My Library</h1>
-            <button class="secondary" style="width: auto; padding: 8px 16px;" onclick="triggerImport()">+ Import</button>
-            <input type="file" id="fileInput" accept=".json" class="hidden" onchange="handleFileImport(this)">
-        </header>
+<header>
+    <h1>📚 My Library</h1>
+    <button class="secondary" style="width: auto; padding: 8px 16px;" onclick="openImportModal()">+ Import</button>
+</header>
 
         <div id="topic-container" class="card">
             <h3>Select a Topic:</h3>
@@ -364,35 +363,59 @@ const PEXELS_API_KEY = 'qQZw9X3j2A76TuOYYHDo2ssebWP5H7K056k1rpdOTVvqh7SVDQr4YyWM
 
         function triggerImport() { document.getElementById('fileInput').click(); }
 
-        function handleFileImport(input) {
-            const file = input.files[0];
-            if (!file) return;
+function handleFileUpload() {
+    const file = document.getElementById('fileInput').files[0];
+    const title = document.getElementById('import-title').value.trim();
+    const nickname = document.getElementById('import-nickname').value.trim();
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    // Validate basic structure
-                    if (!data.title || !Array.isArray(data.questions)) throw new Error("Invalid Format");
-                    
-                    const id = Date.now().toString();
-                    appState.topics[id] = {
-                        id: id,
-                        title: data.title,
-                        nickname: data.title, // Default nickname
-                        questions: data.questions, // Array of {id, text, type, options:[], answerId, imagePath, refPage}
-                        imageRoot: "" // User can set local path
-                    };
-                    saveDB();
-                    renderDashboard();
-                    alert("Import Successful! 🌟");
-                } catch (err) {
-                    alert("Error importing file: " + err.message);
-                }
-            };
-            reader.readAsText(file);
+    if (!file || !title || !nickname) {
+        alert("Please provide a Title, Nickname, and select a file.");
+        return;
+    }
+    
+    // Check for existing title/nickname
+    const existing = Object.values(appState.topics).find(t => t.title === title || t.nickname === nickname);
+    if (existing) {
+        if (!confirm(`A topic with the title "${title}" or nickname "${nickname}" already exists. Do you want to DELETE the old version and replace it with this new file?`)) {
+            return;
         }
+        // Deletion/Replacement Logic (Requirement 1)
+        delete appState.topics[existing.id];
+    }
 
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            // Assuming JSON contains 'questions' array. If PDF, this step would be server-side OCR.
+            if (!Array.isArray(data.questions)) throw new Error("File must contain a 'questions' array.");
+            
+            const id = Date.now().toString();
+            appState.topics[id] = {
+                id: id,
+                title: title,       // Full User Title
+                nickname: nickname, // User-chosen Nickname (GK, Maths)
+                questions: data.questions,
+                imageRoot: "" 
+            };
+            saveDB();
+            closeImportModal();
+            renderDashboard();
+            
+            // Clear inputs after successful import
+            document.getElementById('import-title').value = '';
+            document.getElementById('import-nickname').value = '';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileNameDisplay').innerText = 'No file selected.';
+
+            alert(`Import Successful! Topic "${nickname}" added with ${data.questions.length} questions. 🌟`);
+        } catch (err) {
+            alert("Error: File content is invalid or not in the expected JSON format. Please use the template.");
+        }
+    };
+    // If PDF, we'd send the file to a server endpoint here. For PWA MVP, we read as text (JSON).
+    reader.readAsText(file); 
+}
 // --- NEW PATH SETTING FUNCTION (Add to index.html JS) ---
 function setImageRootPath(topicId, path) {
     if (appState.topics[topicId]) {
@@ -410,13 +433,12 @@ function setImageRootPath(topicId, path) {
                 const li = document.createElement('li');
                 li.className = 'topic-item';
                 li.innerHTML = `
-                    <div>
-                        <strong>${topic.title}</strong><br>
-                        <small>${topic.questions.length} Questions</small>
-                    </div>
-                    <button class="danger" style="width:auto; padding:5px 10px; font-size:0.8rem" onclick="deleteTopic('${topic.id}')">🗑️</button>
-                `;
-                li.onclick = (e) => {
+                <div>
+                    <strong>${topic.nickname}</strong><br> 
+                    <small>${topic.title} (${topic.questions.length} Qs)</small>
+                </div>
+                <button class="danger" style="width:auto; padding:5px 10px; font-size:0.8rem" onclick="deleteTopic('${topic.id}')">🗑️</button>
+            `;                li.onclick = (e) => {
                     if(e.target.tagName !== 'BUTTON') selectTopic(topic.id, li);
                 };
                 list.appendChild(li);
@@ -451,6 +473,16 @@ function setImageRootPath(topicId, path) {
             document.getElementById('q-count-val').innerText = val;
         }
 
+function openImportModal() {
+    document.getElementById('import-modal').style.display = 'flex';
+}
+function closeImportModal() {
+    document.getElementById('import-modal').style.display = 'none';
+}
+function updateFileName() {
+    const input = document.getElementById('fileInput');
+    document.getElementById('fileNameDisplay').innerText = input.files.length > 0 ? input.files[0].name : 'No file selected.';
+}
         // --- 4. QUIZ ENGINE ---
 // --- Start Quiz Function (Updated for Learning Zone Filtering) ---
 function startQuiz(isRetry = false) {
@@ -883,5 +915,28 @@ function navQuestion(dir) {
         });
     }
 </script>
+<div id="import-modal" class="screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; background: rgba(0, 0, 0, 0.4); display: none; align-items: center; justify-content: center;">
+    <div class="card" style="width: 90%; max-width: 500px; padding: 30px; transform: scale(0.95);">
+        <header>
+            <h2 style="color: var(--primary);">📝 Import New Topic</h2>
+            <button class="outline danger" style="width:auto; padding:5px 10px; font-size:0.8rem; box-shadow:none;" onclick="closeImportModal()">✕</button>
+        </header>
+
+        <label for="import-title" style="display: block; margin-bottom: 5px; font-weight: bold;">1. Topic Title (e.g., General Knowledge):</label>
+        <input type="text" id="import-title" placeholder="Enter file title/topic name" 
+               style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;">
+        
+        <label for="import-nickname" style="display: block; margin-bottom: 5px; font-weight: bold;">2. Topic Nickname (e.g., GK):</label>
+        <input type="text" id="import-nickname" placeholder="Short name for selection (GK, Maths)" 
+               style="width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc;">
+        
+        <label for="fileInput" style="display: block; margin-bottom: 5px; font-weight: bold;">3. Select PDF/JSON File:</label>
+        <input type="file" id="fileInput" accept=".json, .pdf" style="margin-bottom: 20px;" onchange="updateFileName()">
+        
+        <div id="fileNameDisplay" style="margin-bottom: 15px; font-size: 0.9rem; color: #666;">No file selected.</div>
+
+        <button onclick="handleFileUpload()">✅ Confirm & Import</button>
+    </div>
+</div>
 </body>
 </html>
