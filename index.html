@@ -331,6 +331,11 @@
     <script>
         // --- 1. STATE MANAGEMENT ---
         const DB_KEY = 'brightspark_db';
+
+// --- 1.5. API Configuration (Architect Warning: Key is exposed in public JS) ---
+// IMPORTANT: Replace 'YOUR_PEXELS_API_KEY_HERE' with your actual Pels Key.
+const PEXELS_API_KEY = 'qQZw9X3j2A76TuOYYHDo2ssebWP5H7K056k1rpdOTVvqh7SVDQr4YyWM'; 
+
         let appState = {
             topics: JSON.parse(localStorage.getItem(DB_KEY)) || {},
             currentTopicId: null,
